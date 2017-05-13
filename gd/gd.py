@@ -14,6 +14,15 @@ def df_dx(x):
 
 EPS = 1e-1
 BASE_LR = 1e-1
+LEFT = -1
+RIGHT = 3
+
+def draw_f():
+    x = np.arange(-1, 3, 0.1)
+    print(x)
+    y = np.array(list(map(f, x)))
+    print(y)
+    plt.plot(x, y)
 
 def main():
     x_i = 0
@@ -30,8 +39,13 @@ def main():
         def line(x):
             return k * x + b
 
-        plt.plot([-1, 3], [line(-1), line(3)])
+        plt.xlim([LEFT, RIGHT])
+        plt.ylim([-6, 7])
+        draw_f()
+        plt.plot([LEFT, RIGHT], [line(LEFT), line(RIGHT)])
         plt.savefig('fig_{}.png'.format(it))
+        plt.clf()
+
         it += 1
 
     print('Root: {}'.format(x_i))
