@@ -75,4 +75,4 @@ def main():
     print('Root: {}'.format(x_i))
 
 if __name__ == '__main__':
-  main()
+    main()
