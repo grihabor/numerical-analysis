@@ -28,11 +28,12 @@ def draw_f():
     plt.plot(x, y, 'b')
 
 def draw_arrow(x, y, arrow_len):
-    plt.plot(
-        [x] + [x + arrow_len, x + 0.8 * arrow_len] * 2, 
-        [y, y, y - 0.2 * arrow_len, y, y + 0.2 * arrow_len],
+    arrow = plt.plot(
+        [x] + [x + arrow_len, x + 0.8 * arrow_len] * 2 + [x + arrow_len, x], 
+        [y, y, y - 0.2 * arrow_len, y, y + 0.2 * arrow_len, y, y],
         'g'
     )
+    plt.setp(arrow, linewidth=3)
     plt.plot(
         [x, x], [y, ROI_BOTTOM], 'g--'
     )
