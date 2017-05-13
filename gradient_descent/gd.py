@@ -22,9 +22,7 @@ ROI_TOP = 8
 
 def draw_f():
     x = np.arange(ROI_LEFT, ROI_RIGHT + 0.1, 0.1)
-    print(x)
     y = np.array(list(map(f, x)))
-    print(y)
     plt.plot(x, y, 'b')
 
 def draw_arrow(x, y, arrow_len):
@@ -65,15 +63,18 @@ def main():
             plt.plot([ROI_LEFT, ROI_RIGHT], [line(ROI_LEFT), line(ROI_RIGHT)], 'r')
             plt.plot(x_list, list(map(f, x_list)), 'go')
             plt.savefig(filename, bbox_inches='tight', dpi=200)
+            print('Save figure: {}'.format(filename))
             plt.clf()
 
         if it < 5 or not condition(x_i - grad):
-            save_figure('fig_{}.png'.format(it))
+            filename = 'fig_{}.png'.format(it)
+            save_figure(filename)
+
 
         it += 1
         x_i -= grad
 
-    print('Root: {}'.format(x_i))
+    print('Minimum: {}'.format(x_i))
 
 if __name__ == '__main__':
     main()
