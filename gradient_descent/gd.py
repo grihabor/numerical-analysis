@@ -25,13 +25,14 @@ def draw_f():
     y = np.array(list(map(f, x)))
     plt.plot(x, y, 'b')
 
-def draw_arrow(x, y, arrow_len):
-    arrow = plt.plot(
-        [x] + [x + arrow_len, x + 0.8 * arrow_len] * 2 + [x + arrow_len, x], 
-        [y, y, y - 0.2 * (arrow_len + 2) / 4, y, y + 0.2 * (arrow_len + 2) / 4, y, y],
-        'g'
-    )
-    plt.setp(arrow, linewidth=2)
+def draw_arrow(x, y, arrow_len=1, only_dot=False):
+    if not only_dot:
+        arrow = plt.plot(
+            [x] + [x + arrow_len, x + 0.8 * arrow_len] * 2 + [x + arrow_len, x], 
+            [y, y, y - 0.2 * (arrow_len + 2) / 4, y, y + 0.2 * (arrow_len + 2) / 4, y, y],
+            'g'
+        )
+        plt.setp(arrow, linewidth=2)
     plt.plot(
         [x, x], [y, ROI_BOTTOM], 'g--'
     )
@@ -41,9 +42,43 @@ def main():
     x_list = []
     x_i = 0
     it = 0
-    
+
+    def special_cases():
+        plt.xlim([ROI_LEFT, ROI_RIGHT])
+        plt.ylim([ROI_BOTTOM, ROI_TOP])
+        draw_f()
+        plt.savefig('fig_func.png', bbox_inches='tight', dpi=200)
+        plt.clf()
+
+        plt.xlim([ROI_LEFT, ROI_RIGHT])
+        plt.ylim([ROI_BOTTOM, ROI_TOP])
+        draw_f()
+        draw_arrow(x_i, f(x_i), only_dot=True)
+        plt.plot([x_i], [f(x_i)], 'go')
+        plt.savefig('fig_dot.png', bbox_inches='tight', dpi=200)
+        plt.clf()
+
+        
+        plt.xlim([ROI_LEFT, ROI_RIGHT])
+        plt.ylim([ROI_BOTTOM, ROI_TOP])
+        draw_f()
+        draw_arrow(x_i, f(x_i), only_dot=True)
+
+        k = df_dx(x_i)
+        b = f(x_i) - k * x_i
+
+        def line(x):
+            return k * x + b
+
+        plt.plot([ROI_LEFT, ROI_RIGHT], [line(ROI_LEFT), line(ROI_RIGHT)], 'r')
+        plt.plot([x_i], [f(x_i)], 'go')
+        plt.savefig('fig_tangent.png', bbox_inches='tight', dpi=200)
+        plt.clf()
+
     def condition(x):
         return abs(df_dx(x)) > EPS
+
+    special_cases()
 
     while condition(x_i):
         x_list.append(x_i)

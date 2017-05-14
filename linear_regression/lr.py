@@ -1,5 +1,7 @@
 import tensorflow as tf 
 import numpy as np 
+from sys import exit, argv
+
 import matplotlib 
 
 matplotlib.use('Agg')
@@ -44,7 +46,7 @@ def draw_lines(line):
 	prev_lines.append((x, y))
 			 
 
-def main():
+def linear():
 	data = generate_data()
 
 	k_var = tf.Variable(tf.constant(0.), name='k')
@@ -59,7 +61,8 @@ def main():
 	
 	def draw_first():
 		draw_data(data)
-		plt.savefig('fig_first.png')
+		plt.axis('off')
+		plt.savefig('fig_first.png', bbox_inches='tight', dpi=200)
 		plt.clf()
 
 	def draw_last():
@@ -70,7 +73,8 @@ def main():
 			return k * x + b
 		draw_data(data)
 		draw_lines(line)
-		plt.savefig('fig_last.png')
+		plt.axis('off')
+		plt.savefig('fig_last.png', bbox_inches='tight', dpi=200)
 
 
 	with tf.Session() as sess:
@@ -86,7 +90,8 @@ def main():
 			if it < 10:
 				draw_lines(line)
 				draw_data(data)
-				plt.savefig('fig_{}.png'.format(it))
+				plt.axis('off')
+				plt.savefig('fig_{}.png'.format(it), bbox_inches='tight', dpi=200)
 				plt.clf()
 
 			def feed_dict():
@@ -99,6 +104,19 @@ def main():
 		
 		draw_last()
 
+def quadratic():
+	pass
+
+def main():
+	params = ['l', 'linear', 'q', 'quadratic']
+	if len(argv) < 2 or argv[1] not in params:
+		print('Usage: [{}]'.format('|'.join(params)))
+		exit(1)
+	
+	if argv[1] in params[:2]:
+		linear()
+	elif argv[1] in params[2:]:
+		quadratic()
 
 
 if __name__ == '__main__':
