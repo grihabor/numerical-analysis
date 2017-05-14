@@ -29,7 +29,6 @@ def draw_data(data):
 	plt.xlim((ROI_LEFT, ROI_RIGHT))
 	plt.ylim((ROI_TOP, ROI_BOTTOM))
 	plt.plot(data[:, 0], data[:, 1], 'bo')
-	plt.savefig('t.png')
 
 
 prev_lines = []
@@ -58,8 +57,25 @@ def main():
 	optimizer = tf.train.GradientDescentOptimizer(BASE_LR, name='GradientDescent')
 	train_op = optimizer.minimize(loss)
 	
+	def draw_first():
+		draw_data(data)
+		plt.savefig('fig_first.png')
+		plt.clf()
+
+	def draw_last():
+		global prev_lines
+		prev_lines = []
+		k, b = sess.run([k_var, b_var])
+		def line(x):
+			return k * x + b
+		draw_data(data)
+		draw_lines(line)
+		plt.savefig('fig_last.png')
+
+
 	with tf.Session() as sess:
 		sess.run(tf.global_variables_initializer())
+		draw_first()
 
 		for it in range(50):
 			k, b = sess.run([k_var, b_var])
@@ -80,15 +96,9 @@ def main():
 				}
 
 			sess.run(train_op, feed_dict=feed_dict())
+		
+		draw_last()
 
-		global prev_lines
-		prev_lines = []
-		k, b = sess.run([k_var, b_var])
-		def line(x):
-			return k * x + b
-		draw_data(data)
-		draw_lines(line)
-		plt.savefig('fig_last.png')
 
 
 if __name__ == '__main__':
