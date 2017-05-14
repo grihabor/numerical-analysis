@@ -6,7 +6,7 @@ matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 
-BASE_LR = 1.5e-4
+BASE_LR = 1e-2
 DATA_SIZE = 20
 
 ROI_LEFT = -8
@@ -32,14 +32,21 @@ def draw_data(data):
 	plt.savefig('t.png')
 
 
-def draw_lines(line, it):
-	plt.plot([ROI_LEFT, ROI_RIGHT], [line(ROI_LEFT), line(ROI_RIGHT)], 'r')
-	plt.savefig('fig_{}.png'.format(it))
+prev_lines = []
+def draw_lines(line):
+
+	for x, y in prev_lines:
+		plt.plot(x, y, 'r')
+
+	x, y = [ROI_LEFT, ROI_RIGHT], [line(ROI_LEFT), line(ROI_RIGHT)]
+	next_line = plt.plot(x, y, 'g')
+	plt.setp(next_line, linewidth=3)
+
+	prev_lines.append((x, y))
 			 
 
 def main():
 	data = generate_data()
-	draw_data(data)
 
 	k_var = tf.Variable(tf.constant(0.), name='k')
 	b_var = tf.Variable(tf.constant(0.), name='b')
@@ -47,7 +54,7 @@ def main():
 	y_in = tf.placeholder(tf.float32, name="groundtrooth_y", shape=[None, 1])
 
 	func = tf.multiply(k_var, x_in) + b_var
-	loss = (func - y_in) ** 2
+	loss = tf.reduce_mean((func - y_in) ** 2)
 	optimizer = tf.train.GradientDescentOptimizer(BASE_LR, name='GradientDescent')
 	train_op = optimizer.minimize(loss)
 	
@@ -61,7 +68,10 @@ def main():
 				return k * x + b
 
 			if it < 10:
-				draw_lines(line, it)
+				draw_lines(line)
+				draw_data(data)
+				plt.savefig('fig_{}.png'.format(it))
+				plt.clf()
 
 			def feed_dict():
 				return {
@@ -71,12 +81,15 @@ def main():
 
 			sess.run(train_op, feed_dict=feed_dict())
 
-		plt.clf()
+		global prev_lines
+		prev_lines = []
 		k, b = sess.run([k_var, b_var])
 		def line(x):
 			return k * x + b
 		draw_data(data)
-		draw_lines(line, 50)
+		draw_lines(line)
+		plt.savefig('fig_last.png')
+
 
 if __name__ == '__main__':
 	main()
